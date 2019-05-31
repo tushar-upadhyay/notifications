@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible">
+    <title>Notificatiions Sending System</title>
+    <style>
+        html,body{
+            height:100%;
+        }
+    #container{
+    min-height: 100%; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+        }
+    #form{
+        border: solid green 1px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px;  
+    }
+    #items{
+        padding-top:10px;
+    }
+    </style>
+</head>
+<body style="height: 100%">
+  <div id="container"  >
+    <div id= "form">
+    <form action="/send" method="post">
+        <div id="items">
+      <select name="attendance" id="">
+          <option value="true">
+            Yes
+          </option>
+          <option value="null">No</option>
+      </select><br>
+        </div>
+        <div id="items">
+        <input type="text" name ="title" placeholder="title" ><br>
+        </div>
+        <div id="items"><input type="text" name="body" placeholder="body" ><br></div>
+        <div id="items"> <input type="text" name="open" placeholder="open" ><br></div>
+       <div id="items"> <input type="text" name="url" placeholder="url" ></div>
+       <br>
+       <button type="submit">Send</button>
+    </div>
+    </form>
+    </div>
+</div>
+</body>
+</html>
