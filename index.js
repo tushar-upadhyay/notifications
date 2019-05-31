@@ -72,7 +72,7 @@ app.get("/",(req,res)=>{
 })
 app.post("/send",(req,res)=>{
   let {attendance,title,body,open,url} = req.body
-  if(attendance=="no"){
+  if(attendance=="null"){
     attendance=null
   }
   send(attendance,title,body,open,url)
