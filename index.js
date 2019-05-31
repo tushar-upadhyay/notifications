@@ -78,4 +78,4 @@ app.post("/send",(req,res)=>{
   send(attendance,title,body,open,url)
   res.send("tushar")
 })
-app.listen(3000||process.env.PORT)
+app.listen(process.env.PORT)
