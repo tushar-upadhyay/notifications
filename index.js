@@ -1,25 +1,61 @@
 var {Expo} = require("expo-server-sdk")
 var express  = require("express")
-var app = express()
-app.use(express.urlencoded({ extended: true }))
+var firebase = require("firebase")
+var bodyParser = require("body-parser")
+var app =express()
+app.use(bodyParser.urlencoded({extended:false}))
+var firebaseConfig = require("./firebaseConfig")
+firebase.initializeApp(firebaseConfig)
 
-function send(attendance,title,body,open,url){
+var ref = firebase.database().ref();
+var data;
+app.get("/",(req,res)=>{
+  res.sendFile(__dirname+"/public/index.html")
+})
+app.post("/send",(req,res)=>{
+  var {attendance,url,body,title,open,password} = req.body
+  if(password=="9993929488@t"){
+    if(attendance=="null"){
+      attendance =null
+    }
+   start(attendance,title,body,open,url)
+    res.send("Success")
+  }
+  else{
+    res.send("You Are Not Authorised to Send Notifications")
+  }
+})
+function start(attendance,title,body,open,url){
+ref.on("value", function(snapshot) {
+ data= snapshot.val()
+var d = Object.values(data)
+d.map(async (x)=>{
+  var res = await fetch(`https://lnctapi.herokuapp.com/?username=${x.username}&password=${x.password}`)
+  res  = await res.json()
+  await send(attendance,title,body,open,url,x.token,res.Percentage,res.Name)
+})
+}, function (error) {
+  console.log("Error: " + error.code);
+});
+}
+
+async function send(attendance,title,body,open,url,token,percentage,name){
 let expo = new Expo();
 let messages = [];
-var somePushTokens = ["ExponentPushToken[PV9K5dD70OnRm3pSpCa6w7]"]
-for (let pushToken of somePushTokens) {
-  
-  if (!Expo.isExpoPushToken(pushToken)) {
-    console.error(`Push token ${pushToken} is not a valid Expo push token`);
-    continue;
+  if (!Expo.isExpoPushToken(token) ){
+    console.error(`Push token ${token} is not a valid Expo push token`);
   }
-  messages.push({
-    to: pushToken,
-    sound: 'default',
-    body: 'This is a test notification',
-    data: { attendance: attendance ,title:title,body:body,open:open,url:url},
-  })
-}
+
+    messages.push({
+      to:token,
+      sound: 'default',
+      title:'Hey ! , ' + name,
+      body: 'Your Attendance is  ' +percentage + " % ",
+      data: { attendance: attendance ,title:title,body:body,open:open,url:url},
+    })
+  
+ 
+
 let chunks = expo.chunkPushNotifications(messages);
 let tickets = [];
 (async () => {
@@ -67,15 +103,5 @@ let receiptIdChunks = expo.chunkPushNotificationReceiptIds(receiptIds);
   }
 })()
 }
-app.get("/",(req,res)=>{
-  res.sendFile(__dirname + "/public/index.html")
-})
-app.post("/send",(req,res)=>{
-  let {attendance,title,body,open,url} = req.body
-  if(attendance=="null"){
-    attendance=null
-  }
-  send(attendance,title,body,open,url)
-  res.send("tushar")
-})
-app.listen(process.env.PORT)
+
+app.listen(process.env.PORT || 3000,()=>console.log("Server Running"))
